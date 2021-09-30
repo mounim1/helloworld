@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="deleteAccountFlow" doc:id="2bdd11f9-c226-4c6e-85ba-24dafab6833d" >
+		<logger level="INFO" doc:name="Logger" doc:id="2c013457-ccc9-4041-89b1-1cb8c1fc632d" message="Delete account flow starts here...................."/>
+		<db:delete doc:name="Delete" doc:id="9a542053-dda4-4843-9f43-1b1b546c4533" config-ref="Database_Config">
+			<db:sql ><![CDATA[DELETE FROM account WHERE accountId = :accountId]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	accountId : attributes.queryParams.accountId
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="d5716eac-fb63-4135-9686-10b496ccb265" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[output application/json
+---
+{
+	statuscode : 200,
+	message : "Account Deleted successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6e9d6b3e-cae6-4665-9483-fe55bbe75c9b" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="27b40563-eef1-41c3-bffa-e0b395858cb8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	status: 500,
+	Message: "application down try after some time"
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

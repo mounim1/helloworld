@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="accountDetailsFlow" doc:id="c44a255d-a194-493e-adcf-89c8dbd46abf" >
+		<logger level="INFO" doc:name="Logger" doc:id="4b1238c3-e0b6-4f3a-8d14-dad1dd1e8a94" message="account deatils flow starts here..........."/>
+		<db:select doc:name="Select" doc:id="6a2c3fc7-6eec-465d-b6cb-bd8d83200824" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * from account WHERE accountId = :accountId;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+accountId : attributes.queryParams.accountId	
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="9969559e-160c-4052-9997-5d0e18bc2a0c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d5fc8486-7770-4d1d-9520-dad1c9d4c1b9" message="Response from DB............#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c4cf7a41-afa7-4a52-9e35-49e096412431" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="c34ba620-9cfa-4a68-8bee-c823c2614f58" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[output application/json
+---
+{
+	status: 500,
+	Message: "application down try after some time"
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

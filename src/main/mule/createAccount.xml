@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="createAccountFlow" doc:id="f5b903f5-798d-456b-b0a0-9f79848d2ccc" >
+		<logger level="INFO" doc:name="Logger" doc:id="593aaf28-e7d7-4f7d-bca9-d1627d08efa9" message="Creat account flow inserting record to DB..................."/>
+		<db:insert doc:name="Insert" doc:id="6f2a8f95-a091-4ae4-87f4-459199db59f1" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into Account(name,phone,email)
+values(:name,:phone, :email);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+name : payload.name,
+phone : payload.mobileNo,
+email : payload.emailId 
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="ba15be03-3647-415e-a69e-8386013c7fab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	statuscode : 200,
+	message : "Account created successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="dd28961b-dd45-4127-a8c0-3fd4f8bcf516" message="Afret transformation............#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="90fcc20a-46d6-485f-a98a-7095c3b65c89" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="6c818f3d-b2b0-4f7f-9432-f7cd0d841aaa" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	status: 500,
+	Message: "application down try after some time"
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

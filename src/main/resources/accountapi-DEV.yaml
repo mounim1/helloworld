@@ -1,0 +1,7 @@
+# Database configurations
+db:
+  host : "localhost"
+  port : "3306"
+  userName : "root"
+  password : "![+6f/uYnEWgY=]"
+  schema : "integration-july"

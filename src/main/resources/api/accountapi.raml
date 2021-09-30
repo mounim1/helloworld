@@ -1,0 +1,94 @@
+#%RAML 1.0
+title: accountapi
+baseUri: http://localhost:8081
+/createAccount:
+  post:
+    body:
+      application/json:
+        example:
+                  {
+                     "name" : "Gayathri22",
+                     "mobileNo" : "90000045",
+                     "emailId" : "gayathri@gmail.com"
+    
+                   }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+                     {
+                        "statuscode": 200,
+                        "message": "Account created       successfully"
+                     }
+
+/accountDetails:
+  get:
+    queryParameters:
+      accountId:
+        example: '1004'
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              [
+                  {
+                      "accountId": 1004,
+                      "dateOfBirth": 31-AUG-2000,
+                      "gender": "F",
+                      "phone": "90000045",
+                      "name": "mouni2",
+                      "email": "mounika@gmail.com"
+                  }
+              ]
+/deleteAccount:
+  delete:
+    queryParameters:
+      accountId : 
+        example: '1001'
+    responses:
+      200:
+       body:
+         application/json:
+           example:
+                    {
+                        "statuscode": 200,
+                        "message": "Account deleted successfully"
+                     }  
+/updateAccount:
+  patch:
+    queryParameters:
+      accountId :
+        example: '0003'
+    body:
+      application/json:
+        example:
+                   {
+                     "name" : "saileela",
+                     "emailId" : "saileela@gmail.com"
+    
+                   }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+                        
+          
+          
+      
+        
+    
+    
+            
+        
+                               
+                     
+             
+        
+          
+            
+          
+                  
+              
